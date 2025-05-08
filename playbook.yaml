@@ -1,0 +1,31 @@
+---
+- name: Deploy Flask App with Dynamic DB Host
+  hosts: app
+  become: true
+  tasks:
+    - name: Install required system packages
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+        state: present
+
+    - name: Clone the repository
+      git:
+        repo: "https://github.com/vinithayampalla/code.git"
+        dest: "/home/ubuntu/code"
+        update: yes
+
+    - name: Create a virtual environment
+      command: python3 -m venv /home/ubuntu/code/venv
+
+    - name: Install Python dependencies in virtual environment
+      command: /home/ubuntu/code/venv/bin/pip install -r /home/ubuntu/code/requirements.txt
+      args:
+        chdir: "/home/ubuntu/code"
+    - name: Start the Flask Application
+      shell: |
+        setsid /home/ubuntu/code/venv/bin/python -u /home/ubuntu/code/app.py 
+      args:
+        chdir: "/home/ubuntu/code"
