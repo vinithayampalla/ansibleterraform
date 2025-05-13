@@ -6,7 +6,7 @@ pipeline {
     }
 
     triggers {
-        cron('*/1 * * * *')  // Run every minute
+        cron('*/1 * * * *') // every 1 minutes
     }
 
     stages {
@@ -19,22 +19,20 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 script {
-                    def planStatus = sh(script: 'terraform plan -detailed-exitcode -out=tfplan || true', returnStatus: true)
+                    def exitCode = sh(script: 'terraform plan -detailed-exitcode -out=tfplan', returnStatus: true)
 
-                    if (planStatus == 2) {
+                    if (exitCode == 2) {
                         echo "⚠️ Drift detected!"
-
-                        // Notify SNS
                         sh '''
                         aws sns publish \
                           --topic-arn "$SNS_TOPIC_ARN" \
-                          --message "Terraform detected infrastructure drift!" \
+                          --message "Terraform detected infrastructure drift." \
                           --subject "Terraform Drift Alert"
                         '''
-                    } else if (planStatus == 0) {
+                    } else if (exitCode == 0) {
                         echo "✅ No drift detected."
                     } else {
-                        error("❌ Terraform plan failed!")
+                        error("❌ Terraform plan failed.")
                     }
                 }
             }
