@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    environment {
+        SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:730335321612:mytopic'
+    }
+
+    triggers {
+        cron('*/1 * * * *')  // Run every minute
+    }
+
+    stages {
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                script {
+                    def planStatus = sh(script: 'terraform plan -detailed-exitcode -out=tfplan || true', returnStatus: true)
+
+                    if (planStatus == 2) {
+                        echo "⚠️ Drift detected!"
+
+                        // Notify SNS
+                        sh '''
+                        aws sns publish \
+                          --topic-arn "$SNS_TOPIC_ARN" \
+                          --message "Terraform detected infrastructure drift!" \
+                          --subject "Terraform Drift Alert"
+                        '''
+                    } else if (planStatus == 0) {
+                        echo "✅ No drift detected."
+                    } else {
+                        error("❌ Terraform plan failed!")
+                    }
+                }
+            }
+        }
+    }
+}
