@@ -1,13 +1,13 @@
 provider "aws" {
     region = "us-west-1"
 }
-terraform {
-  backend "s3" {
-    bucket         = "mybackends3bucket123"
-    key            = "env/terraform.tfstate"
-    region         = "us-east-1"
-  }
-}
+# terraform {
+#   backend "s3" {
+#     bucket         = "mybackends3bucket123"
+#     key            = "env/terraform.tfstate"
+#     region         = "us-east-1"
+#   }
+# }
 
 
 data "aws_vpc" "default" {
