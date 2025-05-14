@@ -75,7 +75,7 @@ resource "aws_security_group" "ec2_sg_ssh_http" {
 
 
 
-resource "aws_instance" "ansible_terraform_jenkinsinstance" {
+resource "aws_instance" "ansible_terraform_jenkinsins" {
   ami           = "ami-07d2649d67dbe8900"
   instance_type = "t2.micro"
   tags = {
