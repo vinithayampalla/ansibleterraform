@@ -79,7 +79,7 @@ resource "aws_instance" "ansible_terraform_jenkinsinstance" {
   ami           = "ami-07d2649d67dbe8900"
   instance_type = "t2.micro"
   tags = {
-    Name = "ansible_terraform_jenkinsinstance"
+    Name = "ansible_terraform_jenkins1"
   }
   key_name                    = "mykeypairhanvi"
   subnet_id                   = data.aws_subnet.public_subnets.id
